@@ -23,7 +23,7 @@ def main():
                 if parts[2] == "C":
                     endTime = time.clock_gettime_ns(0)/1000000
                     et = endTime - startTime
-                    print("Round-trip time: {et} ms")
+                    print(f"Round-trip time: {et} ms")
                 break
             else:
                 print(line)
