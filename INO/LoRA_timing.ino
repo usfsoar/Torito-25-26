@@ -53,7 +53,7 @@ void loop(){
         if(incomingString[secondComma+1]=='C'){
             Serial.print("C recieved!");
             //AT+SEND=<address>,<length>,<data>
-            loraSerial.write("AT+SEND=7,1,C");
+            loraSerial.write("AT+SEND=2,1,C");
             unsigned long startTime = millis();
             Serial.print("Received: ");
         }   
