@@ -14,7 +14,7 @@ def main():
     while(lora.ser.in_waiting>0):
         store = lora.ser.read()
 
-    lora.ser.write("AT+SEND=7,C\r\n")
+    lora.ser.write("AT+SEND=7,1,C\r\n")
     line = ""
     while(1):
         if(lora.ser.in_waiting > 0):
