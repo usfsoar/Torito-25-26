@@ -1,0 +1,31 @@
+
+#Created by J. Huang 
+
+import time
+import jetson_lora_script as LoRaTransceiver
+
+lora = LoRaTransceiver.LoRaTransceiver('/dev/ttyTHS1', 115200)
+lora.configure_module()
+
+def main():
+    startTime = time.clock_gettime_ns(0)/1000000
+    lora.send_message("C","7")
+    line = ""
+    while(1):
+        if(lora.ser.in_waiting > 0):
+            line = lora.ser.readline().decode('utf-8', errors='ignore').strip()
+	 print(line)
+	 if line.startswith("+RCV="):
+       		 parts = line.split(',')
+       	 if len(parts) >= 3:
+            sender_addr = parts[0].split('=')[1]
+            msg_len = parts[1]
+            content = parts[2]
+       	 if parts[2] == "C":
+            endTime = time.clock_gettime_ns(0)/1000000
+            et = endTime - startTime
+            print("Round-trip time: {et} ms")
+    else:
+        print("no") 
+
+main()
