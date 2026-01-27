@@ -45,7 +45,7 @@ class LoRaTransceiver:
         # Reyax modules expect \r\n at the end of commands
         full_command = f"{command}\r\n"
         self.ser.write(full_command.encode('utf-8'))
-        time.sleep(0.1) # Small delay to allow module to process
+        time.sleep(0.03) # Small delay to allow module to process
 
     def configure_module(self):
         """Sets up the Reyax module with specific parameters."""
