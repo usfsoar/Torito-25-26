@@ -10,8 +10,11 @@ lora.configure_module()
 def main():
     startTime = time.time_ns()/1000000
     #lora.send_message("C","7")
-    test = "AT+SEND=7,1,C\r\n"
-    lora.ser.write(test.encode("utf-8"))
+    store = ""
+    while(lora.ser.in_waiting>0):
+        store = lora.ser.read()
+
+    lora.ser.write("AT+SEND=7,1,C\r\n")
     line = ""
     while(1):
         if(lora.ser.in_waiting > 0):
