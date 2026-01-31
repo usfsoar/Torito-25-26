@@ -1,4 +1,4 @@
-#include <libserial/SerialStream.h>
+#include <SerialStream.h>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
