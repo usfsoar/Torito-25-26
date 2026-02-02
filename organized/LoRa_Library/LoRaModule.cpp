@@ -1,0 +1,114 @@
+#include "LoRaModule.h"
+
+LoRaModule::LoRaModule(uint8_t rxPin, uint8_t txPin, uint8_t address) 
+    : _rxPin(rxPin), _txPin(txPin), _address(address) {
+    loraSerial = new HardwareSerial(1);  // Use UART1
+}
+
+bool LoRaModule::begin() {
+    loraSerial->begin(115200, SERIAL_8N1, _rxPin, _txPin);
+    delay(1000);
+    
+    Serial.println("Initializing LoRa Module...");
+    
+    // Verify module is responding
+    if (sendATCommand("AT").indexOf("OK") != -1) {
+        Serial.println("LoRa module responding");
+        return true;
+    } else {
+        Serial.println("WARNING: LoRa module not responding!");
+        return false;
+    }
+}
+
+bool LoRaModule::configure(uint8_t address, unsigned long band, uint8_t networkId) {
+    char cmd[50];
+    
+    // Set address
+    sprintf(cmd, "AT+ADDRESS=%d", address);
+    sendATCommand(cmd);
+    delay(100);
+    
+    // Set band
+    sprintf(cmd, "AT+BAND=%lu", band);
+    sendATCommand(cmd);
+    delay(100);
+    
+    // Set network ID
+    sprintf(cmd, "AT+NETWORKID=%d", networkId);
+    sendATCommand(cmd);
+    delay(100);
+    
+    Serial.println("LoRa configured: Address=" + String(address) + 
+                   ", Band=" + String(band) + 
+                   ", NetworkID=" + String(networkId));
+    return true;
+}
+
+String LoRaModule::sendATCommand(const char* command, unsigned long timeout) {
+    String result = "";
+    
+    Serial.print("Sending: ");
+    Serial.println(command);
+    
+    // Clear buffer
+    while (loraSerial->available()) {
+        loraSerial->read();
+    }
+    
+    loraSerial->println(command);
+    
+    unsigned long startTime = millis();
+    while (millis() - startTime < timeout) {
+        if (loraSerial->available()) {
+            char c = loraSerial->read();
+            result += c;
+        }
+    }
+    
+    Serial.print("Response: ");
+    Serial.println(result);
+    return result;
+}
+
+bool LoRaModule::sendData(uint8_t destAddress, String hexData) {
+    char cmd[100];
+    sprintf(cmd, "AT+SEND=%d,%d,%s", destAddress, hexData.length() / 2, hexData.c_str());
+    String response = sendATCommand(cmd, 2000);
+    return response.indexOf("OK") != -1;
+}
+
+bool LoRaModule::receiveData(String& hexData) {
+    if (!loraSerial->available()) {
+        return false;
+    }
+    
+    String incomingString = "";
+    
+    // Read with timeout
+    unsigned long startTime = millis();
+    while (millis() - startTime < 1000) {
+        if (loraSerial->available()) {
+            char c = loraSerial->read();
+            if (c == '\n') break;
+            incomingString += c;
+        }
+    }
+    
+    // Parse format: +RCV=<address>,<length>,<data>,<RSSI>,<SNR>
+    int firstComma = incomingString.indexOf(',');
+    int secondComma = incomingString.indexOf(',', firstComma + 1);
+    
+    if (firstComma > 0 && secondComma > 0) {
+        hexData = incomingString.substring(secondComma + 1);
+        // Remove RSSI and SNR if present
+        int thirdComma = hexData.indexOf(',');
+        if (thirdComma > 0) {
+            hexData = hexData.substring(0, thirdComma);
+        }
+        hexData.trim();
+        return true;
+    }
+    
+    return false;
+}
