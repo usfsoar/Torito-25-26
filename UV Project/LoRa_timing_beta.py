@@ -2,7 +2,7 @@
 #Created by J. Huang 
 
 import time
-import jetson_lora_script as LoRaTransceiver
+import jetson_lora_script_beta as LoRaTransceiver
 
 lora = LoRaTransceiver.LoRaTransceiver('/dev/ttyTHS1', 115200)
 
@@ -13,10 +13,8 @@ def main():
     line = ""
     while(1):
         if(lora.ser.in_waiting > 0):
-            stop2 = time.clock_gettime_ns(0)/1000000
             line = lora.ser.readline().decode('utf-8', errors='ignore').strip()
             if line.startswith("+RCV="):
-                stop3 = time.clock_gettime_ns(0)/1000000
                 parts = line.split(',')
                 if len(parts) >= 3:
                     sender_addr = parts[0].split('=')[1]
@@ -25,12 +23,8 @@ def main():
                 if parts[2] == "C":
                     endTime = time.clock_gettime_ns(0)/1000000
                     t1 = stop1 - startTime
-                    t2 = stop2 - startTime
-                    t3 = stop3 - startTime
                     et = endTime - startTime
                     print(f"Round-trip time: {t1} ms")
-                    print(f"Round-trip time: {t2} ms")
-                    print(f"Round-trip time: {t3} ms")
                     print(f"Round-trip time: {et} ms")
                 break
             else:
