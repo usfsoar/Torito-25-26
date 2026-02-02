@@ -13,7 +13,7 @@ void setup() {
   
   // Initialize Hardware Serial for LoRa at 115200 baud
   loraSerial.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN);
-  delay(1000);
+  delay(200); // 1000
   
   Serial.println("Initializing LoRa Receiver...");
   
@@ -29,8 +29,10 @@ void setup() {
   delay(100);
   sendATcommand("AT+BAND=915000000", 1000);
   delay(100);
-  sendATcommand("AT+NETWORKID=5", 1000);
-  delay(1000);
+  sendATcommand("AT+NETWORKID=18", 1000);
+  delay(200); // 1000
+  sendATcommand("AT+PARAMETER=5,9,1,4", 1000);
+  delay(200);
   
   Serial.println("Setup complete. Listening for messages...");
   Serial.println("This module is Address 7");
@@ -44,18 +46,30 @@ void loop(){
         while (millis() - startTime < 1000) {
         if (loraSerial.available()) {
             char c = loraSerial.read();
-            if (c == '\n') break;
+            if (c == '\n') {
+              break;
+            }
             incomingString += c;
         }
         }
         int firstComma = incomingString.indexOf(',');
         int secondComma = incomingString.indexOf(',', firstComma + 1);
         if(incomingString[secondComma+1]=='C'){
-            Serial.print("C recieved!");
+            int thirdComma = incomingString.indexOf(',', secondComma + 1);
+            int fourthComma = incomingString.indexOf(',', thirdComma + 1);
+            int end = incomingString.indexOf('\r');
+            String RSSI = incomingString.substring(thirdComma, fourthComma);
+            String SNR = incomingString.substring(fourthComma, end);
+            Serial.println("\nRSSI: ");
+            Serial.println(RSSI);
+            Serial.println("\nSNR: ");
+            Serial.println(SNR);
+
+            Serial.print("\nC recieved!\n");
             //AT+SEND=<address>,<length>,<data>
             loraSerial.println("AT+SEND=2,1,C");
             unsigned long startTime = millis();
-            Serial.print("Received: ");
+            Serial.print("Received: \n");
         }   
 
     }
