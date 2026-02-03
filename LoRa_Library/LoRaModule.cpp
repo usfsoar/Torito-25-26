@@ -87,28 +87,15 @@ bool LoRaModule::receiveData(String& hexData) {
     
     // Read with timeout
     unsigned long startTime = millis();
+    unsigned long lastCharTime = millis();
     while (millis() - startTime < 1000) {
         if (loraSerial->available()) {
             char c = loraSerial->read();
             if (c == '\n') break;
             incomingString += c;
+            lastCharTime = millis();
+        } else if (millis() - lastCharTime > 50) {
+            // No data for 50ms, likely complete
+            break;
         }
     }
-    
-    // Parse format: +RCV=<address>,<length>,<data>,<RSSI>,<SNR>
-    int firstComma = incomingString.indexOf(',');
-    int secondComma = incomingString.indexOf(',', firstComma + 1);
-    
-    if (firstComma > 0 && secondComma > 0) {
-        hexData = incomingString.substring(secondComma + 1);
-        // Remove RSSI and SNR if present
-        int thirdComma = hexData.indexOf(',');
-        if (thirdComma > 0) {
-            hexData = hexData.substring(0, thirdComma);
-        }
-        hexData.trim();
-        return true;
-    }
-    
-    return false;
-}
