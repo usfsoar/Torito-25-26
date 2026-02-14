@@ -1,7 +1,7 @@
 // Sender: MCU1 -> LoRa1 -> LoRa2 -> MCU2 -> Relays
 // Sends relay control commands as hex over LoRa
 
-#include <Arduino.h>
+// #include <Arduino.h>
 #include "lora_config.h"
 #include "LoRaModule.h"
 

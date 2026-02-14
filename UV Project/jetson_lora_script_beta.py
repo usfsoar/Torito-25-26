@@ -22,7 +22,7 @@ BAUD_RATE = 115200
 LORA_ADDRESS = "2"
 LORA_NETWORK_ID = "18"
 LORA_BAND = "915000000"
-LORA_PARAMETERS = "5,9,1,4"
+LORA_PARAMETERS = "11,9,4,24"
 
 class LoRaTransceiver:
     def __init__(self, port, baud):

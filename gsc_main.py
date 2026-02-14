@@ -1,0 +1,101 @@
+from smbus2 import SMBus
+from pynput import keyboard
+import time
+import matplotlib.pyplot as plt
+
+bus = SMBus(1)
+address = 0x08
+bin_string = "1000000000000000"
+solenoid_status = [0,0,0,0,0,0]
+
+def request_data():
+	data = bus.read_i2c_block_data(address,0,2)
+	combined_int = (data[0] << 8) | data[1]
+
+	binary_string = f"{combined_int:016b}"
+	return binary_string
+
+def bin_to_hex(bin_string):
+	return hex(int(bin_string,2))
+
+def hex_to_bin(hex_string):
+	return bin(int(hex_string,16))
+
+current_key = None
+pressed_keys = set()
+
+def on_press(key):
+	global current_key, pressed_keys
+	if key not in pressed_keys:
+		pressed_keys.add(key)
+		try:
+			current_key = key.char
+		except AttributeError:
+			current_key = str(key)[4:]
+		print(f"New Press Detected: {current_key}")
+
+def on_release(key):
+	global pressed_keys
+
+	if key in pressed_keys:
+		pressed_keys.remove(key)
+listener = keyboard.Listener(on_press=on_press, on_release=on_release)
+listener.start()
+
+plt.ion()
+plt.title('State')
+plt.pause(0.1)
+plt.yticks([0,1],["OFF","ON"])
+plt.xticks([1,2,3,4,5,6])
+plt.show()
+try:
+	while True:
+		received = ""
+		if current_key is not None:
+			print(f"Key Detected: {current_key}")
+			match(current_key):
+				case '1' | '2' | '3' | '4' | '5' | '6':
+					try:
+						solenoid = int(current_key)
+						state = 1 - int(bin_string[solenoid])
+						bin_string = bin_string[:solenoid] + str(state) + bin_string[solenoid+1:]
+						#print(bin_string)
+						hex_string = bin_to_hex(bin_string)
+						#print(hex_string)
+						# handle LORA transmission
+					except:
+						print("Failed Transmission")
+				case 'a':
+					try:
+						bin_string = bin_string[0] + "000000" + bin_string[7:]
+						#print(bin_string)
+						hex_string = bin_to_hex(bin_string)
+						#print(hex_string)
+						# open all solenoids
+					except:
+						print("Failed transmission! We are fucked!!!")
+				case _:
+					pass
+			current_key = None
+		received = request_data()
+		if received:
+			received = bin_string
+			#print(received)
+			solenoid_str = list(received[1:7])
+			solenoid_status = list(map(int, solenoid_str))
+			#print(solenoid_status)
+			
+			
+		# handle data
+		plt.cla()
+		plt.bar([1,2,3,4,5,6], solenoid_status, color='b')
+		plt.title("State")
+		plt.yticks([0,1],["OFF","ON"])
+		plt.xticks([1,2,3,4,5,6])
+		plt.draw()
+		plt.pause(0.1)
+except KeyboardInterrupt:
+	print("\nStopping...")
+	listener.stop()
+
+
