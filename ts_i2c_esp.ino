@@ -3,8 +3,8 @@
 
 #define I2C_DEV_ADDR 0x08
 
-#define RX_PIN 3  // D7 on XIAO ESP32S3
-#define TX_PIN 2  // D6 on XIAO ESP32S3
+#define RX_PIN 3  // D3 on XIAO ESP32S3
+#define TX_PIN 2  // D2 on XIAO ESP32S3
 
 HardwareSerial lora(1);
 String toJetson;
