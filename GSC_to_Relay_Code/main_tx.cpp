@@ -2,8 +2,8 @@
 // Sends relay control commands as hex over LoRa
 
 // #include <Arduino.h>
-#include "lora_config.h"
 #include "LoRaModule.h"
+#include "lora_config.h"
 
 // Pin configuration for XIAO ESP32S3 sender
 #define RX_PIN 44  // GPIO44 D7 (RX on XIAO) - connects to LoRa TX
