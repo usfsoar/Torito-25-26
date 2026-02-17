@@ -1,9 +1,9 @@
 #include <iostream>
-#include <libserial.h>
+#include <SerialStream.h>
 
 constexpr const char* const SERIAL_PORT = "/dev/ttyTHS1";
 
-using LibSerial
+using namespace LibSerial;
 
 using namespace std;
 

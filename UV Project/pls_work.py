@@ -3,7 +3,6 @@ from pynput import keyboard
 import time
 import matplotlib.pyplot as plt
 import jetson_lora_script_beta as LoRaTransceiver
-import binascii
 
 lora = LoRaTransceiver.LoRaTransceiver('/dev/ttyTHS1', 115200)
 line = ""
@@ -26,10 +25,9 @@ solenoid_status = [0,0,0,0,0,0]
 
 def request_data():
 	data = bus.read_i2c_block_data(address,0,4)
-	print(type(data))
 	data = "".join([chr(b) for b in data])
-	
-	value= int(data,16)
+
+	value= int(data, 16)
 
 	binary = f"{value:016b}"
 	return binary
@@ -122,5 +120,4 @@ try:
 except KeyboardInterrupt:
 	print("\nStopping...")
 	listener.stop()
-
 

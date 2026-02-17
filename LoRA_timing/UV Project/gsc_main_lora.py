@@ -3,21 +3,13 @@ from pynput import keyboard
 import time
 import matplotlib.pyplot as plt
 import jetson_lora_script_beta as LoRaTransceiver
-import binascii
 
 lora = LoRaTransceiver.LoRaTransceiver('/dev/ttyTHS1', 115200)
-line = ""
-
 lora.send_at_command("AT")
-if(lora.ser.in_waiting > 0):
-	line = lora.ser.readline().decode('utf-8', errors='ignore').strip()
-
-print(line)
 lora.send_at_command("AT+ADDRESS=2")
 lora.send_at_command("AT+NETWORKID=18")
 
-
-
+lora.send_at_command("AT+PARAMETER=11,9,4,24")
 
 bus = SMBus(1)
 address = 0x08
@@ -25,14 +17,11 @@ bin_string = "1000000000000000"
 solenoid_status = [0,0,0,0,0,0]
 
 def request_data():
-	data = bus.read_i2c_block_data(address,0,4)
-	print(type(data))
-	data = "".join([chr(b) for b in data])
-	
-	value= int(data,16)
+	data = bus.read_i2c_block_data(address,0,2)
+	combined_int = (data[0] << 8) | data[1]
 
-	binary = f"{value:016b}"
-	return binary
+	binary_string = f"{combined_int:016b}"
+	return binary_string
 
 def bin_to_hex(bin_string):
 	return hex(int(bin_string,2))
@@ -78,18 +67,15 @@ try:
 						solenoid = int(current_key)
 						state = 1 - int(bin_string[solenoid])
 						bin_string = bin_string[:solenoid] + str(state) + bin_string[solenoid+1:]
-						#print(bin_string)
+						print(bin_string)
 						hex_string = bin_to_hex(bin_string)
 						#print(hex_string)
-						#print(hex_string)
 						# handle LORA transmission
-						data = f"{hex_string}"
-						# print(data)
-						# print(type(data))
+						data = f"{hex_string:x}"
 						lora.send_message(data, "7")
 
-					except Exception as e:
-						print(f"Failed Transmissiosn {e}")
+					except:
+						print("Failed Transmission")
 				case 'a':
 					try:
 						bin_string = bin_string[0] + "000000" + bin_string[7:]
@@ -103,8 +89,8 @@ try:
 					pass
 			current_key = None
 		received = request_data()
-		print(received)
 		if received:
+			received = bin_string
 			#print(received)
 			solenoid_str = list(received[1:7])
 			solenoid_status = list(map(int, solenoid_str))
