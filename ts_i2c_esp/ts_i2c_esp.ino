@@ -1,5 +1,5 @@
-#include <Wire.h>
-#include <HardwareSerial.h>
+#include <Wire.h> // 
+#include <HardwareSerial.h> // Provides 3x UART hardware serial capability
 
 #define I2C_DEV_ADDR 0x08
 
@@ -14,7 +14,7 @@
 HardwareSerial lora1(1); // Hardware UART 1
 HardwareSerial lora2(2); // Hardware UART 2
 
-String toJetson;
+String toJetson; // Initialize empty string that will eventually be sent to Jetson
 
 void onRequest() {
   Wire.print(toJetson);
@@ -97,6 +97,8 @@ void loop() {
   }
 }
 
+// On call, parses received data and sends to Jetson
+
 void parseAndSendToJetson(String rcvData){
   int firstComma = rcvData.indexOf(',');
   int secondComma = rcvData.indexOf(',', firstComma + 1);
@@ -109,6 +111,8 @@ void parseAndSendToJetson(String rcvData){
   toJetson = payload.c_str();
   Serial.print(toJetson);
 }
+
+// AT Command Sender
 
 String sendATcommand(const char *toSend, unsigned long ms, HardwareSerial &name) {
   name.println(toSend);
