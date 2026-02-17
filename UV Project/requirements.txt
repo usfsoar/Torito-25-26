@@ -1,0 +1,6 @@
+# GSC / UV Project – install with: pip install -r requirements.txt
+# From repo root: pip install -r "Torito-25-26/UV Project/requirements.txt"
+matplotlib>=3.5
+numpy>=1.20
+pandas>=1.3
+pyserial>=3.5
