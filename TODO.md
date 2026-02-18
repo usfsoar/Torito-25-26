@@ -1,5 +1,7 @@
-Ranked by priority with higher having greatest priority:
+Ranked by priority:
 
->>> Edit 'GSC_ESP.ino' to transmit/receive/print between the LoRa's. This is proof of concept for integration into GSC Jetson Nano GUI.
->>> Establish GUI for Jetson utilizing 'gsc_dashboard.py' and 'gsc_main.py' as well as dir archive.
-> Add debug from TS ESP -> TS Teensy in 'TS_ESP.ino'. Currently, TS Teensy echoes the command sent to control the relays rather than useful debug.
+>>>> Determine/create debug data/code sent from TS ESP -> TS TEENSY. From there, exact data transmission format from TS TEENSY back to GSC. Make sure it either specifies number of sensors or number of sensors can be derived from length. Make sure this is also true for other size-mutable data, if there is any.
+
+> Send 'gsc_main.py' & 'GSC_ESP.ino' and out-of-date children to archive. Update archive 'README.md' as well.
+
+Continue GUI: https://share.google/aimode/bjYlRl03OWoFkosvn

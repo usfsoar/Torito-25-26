@@ -3,6 +3,8 @@ arduino hosts '.ino' files created and updated primarily in the Arduino IDE. Thi
 
 'GSC_ESP.ino'
     Initializes GSC TX/RX LoRa's. Transmits commands from Jetson to TS ESP and data from Teensy to Jetson.
+    # INITIAL only have RX functionality. -save2 has TX/RX functionality between two LoRa's both on GSC ESP, but can be easily modified
+    # to TX to TS ESP and RX from TS TEENSY. Note that BAND might need to be different between the two, not just ADDRESS/NETWORK.
 'TS_ESP.ino'
     Initializes TS RX LoRa. Transmits valid commands to relays.
 'TS_TEENSY-single.ino'
