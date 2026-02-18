@@ -10,6 +10,8 @@ UV is holistic Python development manager. It organizes Python projects, offerin
 [src_b] For production
 'gsc_main.py'
     -
+    # -save successfully TX/RX a hard-coded message. -save2 creates a rough template for GUI. -save3 fixes and defines next steps for serial_worker() as
+    # well as fixes minor issues with the GUI boilerplate. GUI development must happen in parallel to control flow modifications to ensure RX data quality.
 'gsc_dashboard.py'
     -
 
