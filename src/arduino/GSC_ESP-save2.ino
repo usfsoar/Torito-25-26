@@ -1,4 +1,4 @@
-#include <Wire.h>
+// #include <Wire.h>
 #include <HardwareSerial.h> // Provides 3x UART hardware serial capability
 
 #define I2C_DEV_ADDR 0x08
@@ -24,7 +24,7 @@ bool waitingForReply = false;
 
 String toJetson; // Initialize empty string that will eventually be sent to Jetson
 
-void onRequest() {
+/* void onRequest() {
   Wire.print(toJetson);
 }
 
@@ -35,7 +35,7 @@ void onReceive(int len) {
       Serial.print(c);
     }
   }
-}
+} */
 
 void setup() {
   Serial.begin(115200);
@@ -87,8 +87,8 @@ void setup() {
 
 
   // Join I2C bus as slave with address 0x08
-  Wire.begin(I2C_DEV_ADDR); 
-  Wire.onRequest(onRequest);
+  /* Wire.begin(I2C_DEV_ADDR); 
+  Wire.onRequest(onRequest); */
 
   Serial.println("Setup complete. Format: <command>,<address> or <command>,<address>:repeat");
   Serial.println("Example: Hello,7:repeat");
