@@ -1,0 +1,9 @@
+{
+  "name": "LoRa_Library",
+  "version": "1.0.0",
+  "author": "(local)",
+  "description": "E22 LoRa AT-module helper — ESP-only (ESP32 / ESP8266)",
+  "keywords": ["lora", "e22", "esp32", "esp8266"],
+  "frameworks": ["arduino"],
+  "platforms": ["espressif32", "espressif8266"]
+}

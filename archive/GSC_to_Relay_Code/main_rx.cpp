@@ -23,7 +23,7 @@
 const uint8_t relayPins[6] = {RELAY1, RELAY2, RELAY3, RELAY4, RELAY5, RELAY6};
 
 // Create LoRa module instance
-LoRaModule lora(RX_PIN, TX_PIN, LORA_RECEIVER_ADDRESS);
+LoRaModule lora(RX_PIN, TX_PIN, LORA_RECEIVER_ADDRESS, Serial1);
 
 // Function Prototypes
 void setRelays(uint16_t state);

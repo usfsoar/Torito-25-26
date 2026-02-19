@@ -2,6 +2,8 @@
 
 Custom library for E22 LoRa module communication on ESP32.
 
+> Note: This library is intentionally restricted to ESP platforms (ESP32 and ESP8266). It will produce a compile-time error on non-ESP targets.
+
 ## Files
 
 - **LoRaModule.h** - Header file with class definition
