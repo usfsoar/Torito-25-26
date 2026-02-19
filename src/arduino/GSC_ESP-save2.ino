@@ -69,10 +69,10 @@ void setup() {
   }
 
   // Configure this module as receiver (address 3)
-  sendATcommand("AT+ADDRESS=1", 100, RXLORA);
-  sendATcommand("AT+ADDRESS=2", 100, TXLORA);
+  sendATcommand("AT+ADDRESS=4", 100, RXLORA);
+  sendATcommand("AT+ADDRESS=1", 100, TXLORA);
   delay(100);
-  sendATcommand("AT+BAND=928000000", 100, RXLORA);
+  sendATcommand("AT+BAND=915000000", 100, RXLORA);
   sendATcommand("AT+BAND=928000000", 100, TXLORA);
   delay(100);
   sendATcommand("AT+NETWORKID=18", 100, RXLORA);

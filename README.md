@@ -22,3 +22,7 @@ https://www.homemade-circuits.com/communication-protocols-in-microcontrollers-ex
 Additional Comments:
 We use a TP-Link Extender to provide Wi-Fi capability since the Jetson Nano has a 1Gbps ethernet port, but no Wi-Fi chip.
 '...-save...' files are temporary duplicates made for immediate testing. PLEASE fork/pull-request or commit/push for anything larger than single file edits. I refuse to do this all over again.
+
+LORA STATES:
+1,3: 0 dBm
+4: -50 dBm
