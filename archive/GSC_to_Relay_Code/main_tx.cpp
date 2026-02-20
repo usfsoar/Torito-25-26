@@ -10,7 +10,7 @@
 #define TX_PIN 43  // GPIO43 D6 (TX on XIAO) - connects to LoRa RX
 
 // Create LoRa module instance
-LoRaModule lora(RX_PIN, TX_PIN, LORA_SENDER_ADDRESS);
+LoRaModule lora(RX_PIN, TX_PIN, LORA_SENDER_ADDRESS, Serial1);
 
 // Function prototypes
 void sendRelayCommand(uint16_t relayState);
