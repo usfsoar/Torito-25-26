@@ -6,8 +6,8 @@
 #include "lora_config.h"
 #include "LoRaModule.h"
 
-#define RX_PIN 44  // GPIO44 D7 (RX on XIAO) - connects to LoRa TX
-#define TX_PIN 43  // GPIO43 D6 (TX on XIAO) - connects to LoRa RX
+#define RX_PIN 8  // GPIO44 D7 (RX on XIAO) - connects to LoRa TX
+#define TX_PIN 9  // GPIO43 D6 (TX on XIAO) - connects to LoRa RX
 
 // I2C address for the Teensy that receives the binary relay command (change if needed)
 #define TEENSY_I2C_ADDRESS 0x08
@@ -16,8 +16,8 @@
 #define RELAY2 2
 #define RELAY3 3
 #define RELAY4 4
-#define RELAY5 5
-#define RELAY6 6
+#define RELAY5 6
+#define RELAY6 7
 
 // Array of relay pins - using GPIO numbers that correspond to D0-D5 on XIAO
 const uint8_t relayPins[6] = {RELAY1, RELAY2, RELAY3, RELAY4, RELAY5, RELAY6};
@@ -40,6 +40,12 @@ void setup() {
   // Start I2C (Wire) as master
   Wire.begin();
   Serial.println("Wire (I2C) initialized");
+
+  // Send initial default value 0x8000 to the Teensy so the I2C client has a known state
+  // (Teensy `receiveEvent` will process this on boot). MSB-first (2 bytes).
+  sendToTeensy(0x8000);
+  delay(10); // short pause to ensure slave has time to receive
+  Serial.println("Initial I2C value 0x8000 sent to Teensy");
   
   // Initialize relay pins as outputs
   for (uint8_t i = 0; i < 6; i++) {
