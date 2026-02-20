@@ -1,16 +1,16 @@
 // Sender: MCU1 -> LoRa1 -> LoRa2 -> MCU2 -> Relays
 // Sends relay control commands as hex over LoRa
 
-// #include <Arduino.h>
-#include "LoRaModule.h"
-#include "lora_config.h"
+#include <Arduino.h>
+#include <lora_config.h>
+#include <LoRaModule.h>
 
 // Pin configuration for XIAO ESP32S3 sender
 #define RX_PIN 44  // GPIO44 D7 (RX on XIAO) - connects to LoRa TX
 #define TX_PIN 43  // GPIO43 D6 (TX on XIAO) - connects to LoRa RX
 
 // Create LoRa module instance
-LoRaModule lora(RX_PIN, TX_PIN, LORA_SENDER_ADDRESS, Serial1);
+LoRaModule lora(RX_PIN, TX_PIN, LORA_SENDER_ADDRESS);
 
 // Function prototypes
 void sendRelayCommand(uint16_t relayState);
