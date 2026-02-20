@@ -19,6 +19,7 @@
 #define RELAY5 6
 #define RELAY6 7
 
+
 // Array of relay pins - using GPIO numbers that correspond to D0-D5 on XIAO
 const uint8_t relayPins[6] = {RELAY1, RELAY2, RELAY3, RELAY4, RELAY5, RELAY6};
 
