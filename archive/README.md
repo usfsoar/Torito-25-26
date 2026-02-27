@@ -1,21 +1,28 @@
-About archive:
-archive holds archived dir and files either made obsolete or with a plan for future use. Contents are kept for reference or implementation.
+About uv_project:
+UV is holistic Python development manager. It organizes Python projects, offering Python/dependencies version control. This folder holds the src for the Jetson Nano (currently entirely Python).
 
-[gui] GUI implementation
-'plottingShit.py'
-    A demo of static draw ability using matplotlib.
-'gscPlots.py'
-    A demo of 'gsc_dashboard.py' that constantly draws using matplotlib.
+[src_a] For testing
+'lora_class.py'
+    A class file for 'lora_timing.py'. It is also able to run independently, sending a message to an address for a set of coded parameters.
+'lora_timing.py'
+    A file that times latency of a from-and-back transmission (Python).
 
-[src_a] C++ implementation
-    Contains src for C++ on Jetson Nano for TX and Test Stand ESP32 for RX. Will be implemented post Cold Flow 1. Code for Test Stand TX is w/ DAQ. Jetson Nano RX needs to be implemented to meet post CF1 design strategy and Jetson Nano TX may need to be changed.
-dir 'GSC_to_Relay_Code'
-    Contains 'main_rx.cpp' (TS ESP32 RX) and 'main_tx.cpp' (Jetson Nano TX).
-dir 'LoRa_Library'
-    Contains header config and provides basic LoRa functionality ('LoRaModule.cpp').
+[src_b] For production
+'gsc_main.py'
+    -
+    # -save successfully TX/RX a hard-coded message. -save2 creates a rough template for GUI. -save3 fixes and defines next steps for serial_worker() as
+    # well as fixes minor issues with the GUI boilerplate. GUI development must happen in parallel to control flow modifications to ensure RX data quality.
+'gsc_dashboard.py'
+    -
 
-[src_b] For LoRa testing
-'lora_receiver.ino'
-    Receives tranmission, prints RSSI/SNR/etc., and sends feedback to 'lora_sender.ino'.
-'lora_sender.ino'
-    Sends the transmission, and receives/prints TIME and other feedback from 'lora_receiver.ino'.
+[env] Organizes the project
+dir '.venv'
+    Procures and manages dependencies from uv.lock. Is git-ignored; equivalent src is found in uv.lock and can be built from there.
+'.python-version'
+    Identifies project python version.
+'pyproject.toml'
+    Sets the general dependencies for the UV Project as well as provides basic information.
+'pyrightconfig.json'
+    Adds dir '.venv' to the path for Pylance (a common extension for Python development).
+'uv.lock'
+    A snapshot of the exact dependencies used in the project as well as src for them.
