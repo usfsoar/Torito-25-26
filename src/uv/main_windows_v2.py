@@ -409,6 +409,46 @@ def build_main_windows():
 
 dpg.create_context()
 
+# ---------- CUSTOM FONT ----------
+with dpg.font_registry():
+    default_font = dpg.add_font("C:/Windows/Fonts/arial.ttf", 24)  # adjust size here
+
+dpg.bind_font(default_font)
+
+# ---------------- LIGHT THEME ----------------
+with dpg.theme() as light_theme:
+    with dpg.theme_component(dpg.mvAll):
+        # Backgrounds
+        dpg.add_theme_color(dpg.mvThemeCol_WindowBg, (245, 245, 245, 255))
+        dpg.add_theme_color(dpg.mvThemeCol_ChildBg, (250, 250, 250, 255))
+        dpg.add_theme_color(dpg.mvThemeCol_PopupBg, (255, 255, 255, 255))
+        dpg.add_theme_color(dpg.mvThemeCol_FrameBg, (255, 255, 255, 255))
+
+        # Title bars
+        dpg.add_theme_color(dpg.mvThemeCol_TitleBg, (220, 220, 220, 255))
+        dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (200, 200, 200, 255))
+
+        # Buttons
+        dpg.add_theme_color(dpg.mvThemeCol_Button, (220, 220, 220, 255))
+        dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (200, 200, 200, 255))
+        dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (180, 180, 180, 255))
+        dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 4)
+        dpg.add_theme_style(dpg.mvStyleVar_FramePadding, 6, 6)
+
+        # Text
+        dpg.add_theme_color(dpg.mvThemeCol_Text, (0, 0, 0, 255))
+
+        # Plots
+        dpg.add_theme_style(dpg.mvPlotStyleVar_LineWeight, 3)
+
+        # Border
+        dpg.add_theme_style(dpg.mvStyleVar_FrameBorderSize, 2)
+        dpg.add_theme_style(dpg.mvStyleVar_WindowBorderSize, 2)
+
+
+dpg.bind_theme(light_theme)
+# ------------------------------------------------
+
 # Keyboard Handler Registry
 with dpg.handler_registry():
     dpg.add_key_press_handler(callback=key_press_handler)
