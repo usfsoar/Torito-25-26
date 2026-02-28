@@ -189,7 +189,7 @@ def toggle_solenoid(solenoid_idx):
 def key_press_handler(sender, app_data):
     """Listens for Shift + Number Row to actuate valves."""
     key_code = app_data
-
+    # print("KEY: ", key_code)
     # Check specifically for Left Shift or Right Shift
     if dpg.is_key_down(dpg.mvKey_LShift) or dpg.is_key_down(dpg.mvKey_RShift):
         # Map keys '1' through '9
@@ -197,6 +197,9 @@ def key_press_handler(sender, app_data):
         if 537 <= key_code <= 545: 
             sol_index = key_code - 537
             toggle_solenoid(sol_index)
+        if key_code == 546:
+            emergency_stop()
+            return
   
 
 def emergency_stop():
@@ -209,10 +212,10 @@ def emergency_stop():
 
         # Always set validation bit
         data_store.cmd_solenoid_bits |= 0x8000
-        data_store.cmd_solenoid_bits &= 0x8800  # Clear all other bits
+        # data_store.cmd_solenoid_bits &= 0x8800  # Clear all other bits
         # Valve 4 = index 3
         bit_position = 14 - 3
-        data_store.cmd_solenoid_bits |= (1 << bit_position)
+        # data_store.cmd_solenoid_bits |= (1 << bit_position)
 
         bits_to_send = data_store.cmd_solenoid_bits
 

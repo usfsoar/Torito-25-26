@@ -175,10 +175,10 @@ def toggle_solenoid(solenoid_idx):
         # Map solenoid 0–5 to bits 14–9
         bit_position = 14 - solenoid_idx
 
+        data_store.cmd_solenoid_bits ^= (1 << bit_position)
+
         # Always force MSB validation bit
         data_store.cmd_solenoid_bits |= 0x8000
-        
-        data_store.cmd_solenoid_bits ^= (1 << bit_position)
 
         bits_to_send = data_store.cmd_solenoid_bits
 
@@ -189,7 +189,7 @@ def toggle_solenoid(solenoid_idx):
 def key_press_handler(sender, app_data):
     """Listens for Shift + Number Row to actuate valves."""
     key_code = app_data
-
+    # print("KEY: ", key_code)
     # Check specifically for Left Shift or Right Shift
     if dpg.is_key_down(dpg.mvKey_LShift) or dpg.is_key_down(dpg.mvKey_RShift):
         # Map keys '1' through '9
@@ -197,6 +197,36 @@ def key_press_handler(sender, app_data):
         if 537 <= key_code <= 545: 
             sol_index = key_code - 537
             toggle_solenoid(sol_index)
+        if key_code == 546:
+            emergency_stop()
+            return
+  
+
+def emergency_stop():
+    """SHIFT + A: Turn OFF all valves except Valve 4 (index 3)."""
+    print("!!! EMERGENCY STOP ACTIVATED !!!")
+    with data_store.lock:
+
+        # Start clean
+        data_store.cmd_solenoid_bits = 0
+
+        # Always set validation bit
+        data_store.cmd_solenoid_bits |= 0x8000
+        # data_store.cmd_solenoid_bits &= 0x8800  # Clear all other bits
+        # Valve 4 = index 3
+        bit_position = 14 - 3
+        # data_store.cmd_solenoid_bits |= (1 << bit_position)
+
+        bits_to_send = data_store.cmd_solenoid_bits
+
+    # Clear queued commands so E-Stop is immediate
+    while not command_queue.empty():
+        command_queue.get()
+
+    command_queue.put(bits_to_send)
+
+    print("!!! EMERGENCY STOP ACTIVATED !!!")
+    print(f"Command bits: {bits_to_send:016b}")
 
 def zero_pressures():
     with data_store.lock:
@@ -402,6 +432,7 @@ with dpg.window(label="Test Stand Configuration", tag="setup_window", width=400,
 dpg.create_viewport(title="Liquid Propulsion Ground Station", width=1000, height=800)
 dpg.setup_dearpygui()
 dpg.show_viewport()
+dpg.set_primary_window("setup_window", True)
 
 while dpg.is_dearpygui_running():
     update_gui()
