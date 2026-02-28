@@ -118,16 +118,14 @@ def toggle_solenoid(solenoid_idx):
 
 def key_press_handler(sender, app_data):
     """Listens for Shift + Number Row to actuate valves."""
-    # app_data contains the key code. DPG key codes for 1-9 are 49-57
     key_code = app_data
-    
-    # Check if left or right shift is held
-    if dpg.is_key_down(dpg.mvKey_Shift) or dpg.is_key_down(dpg.mvKey_RShift):
-        # Map keys '1' through '9' to solenoid indices 0 through 8
+
+#Check specifically for Left Shift or Right Shift
+    if dpg.is_key_down(dpg.mvKey_LShift) or dpg.is_key_down(dpg.mvKey_RShift):
+        # Map keys '1' through '9' (key codes 49-57) to solenoid indices 0 through 8
         if 49 <= key_code <= 57: 
             sol_index = key_code - 49
             toggle_solenoid(sol_index)
-
 # --- GUI UPDATE LOOP ---
 
 def update_gui():
