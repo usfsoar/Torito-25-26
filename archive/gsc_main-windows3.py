@@ -5,7 +5,7 @@ import dearpygui.dearpygui as dpg
 
 BAUD = 115200
 HISTORY_LENGTH = 150 # Number of ticks to display on the scrolling plots
-
+dest_address = 2
 # Global configuration set by the setup window
 config = {
     "port": "",
@@ -20,8 +20,8 @@ config = {
 
 class TelemetryData:
     def __init__(self):
-        self.solenoid_bits = 0
-        self.cmd_solenoid_bits = 0 # What we want to send
+        self.solenoid_bits = 0x8000
+        self.cmd_solenoid_bits = 0x8000 # What we want to send
         self.history_y = {} # Will be populated dynamically
         self.history_x = {}
         self.current_tick = 0
@@ -79,7 +79,7 @@ def serial_worker():
                 adc_values = unpacked[5:]
                 
                 with data_store.lock:
-                    data_store.solenoid_bits = solenoids
+                    data_store.so1lenoid_bits = solenoids
                     data_store.current_tick += 1
                     
                     for idx, val in enumerate(adc_values):
@@ -106,26 +106,30 @@ def serial_worker():
 
 def toggle_solenoid(solenoid_idx):
     """Toggles the state of a specific solenoid and queues the command."""
-    if solenoid_idx >= config["num_sol"]: return
+    if solenoid_idx > config["num_sol"]: return
     
     with data_store.lock:
         # Toggle the bit in our command state
-        data_store.cmd_solenoid_bits ^= (1 << solenoid_idx)
-        bits_to_send = data_store.cmd_solenoid_bits
+        data_store.cmd_solenoid_bits ^= (0x8000 >> solenoid_idx)
         
-    command_queue.put(bits_to_send)
-    print(f"Commanded Solenoid {solenoid_idx} Toggle. Current CMD state: {bits_to_send:06b}")
+    print(f"{data_store.solenoid_bits:#06x},{dest_address}")
+
+    data_store.serial_port.write(f"{data_store.solenoid_bits:#06x},{dest_address}")
+
+    print(f"Commanded Solenoid {solenoid_idx} Toggle. Current CMD state: {data_store.cmd_solenoid_bits:06b}")
 
 def key_press_handler(sender, app_data):
     """Listens for Shift + Number Row to actuate valves."""
     key_code = app_data
 
-#Check specifically for Left Shift or Right Shift
+    # Check specifically for Left Shift or Right Shift
     if dpg.is_key_down(dpg.mvKey_LShift) or dpg.is_key_down(dpg.mvKey_RShift):
-        # Map keys '1' through '9' (key codes 49-57) to solenoid indices 0 through 8
+        # Map keys '1' through '9
+        # ' (key codes 49-57) to solenoid indices 0 through 8
         if 49 <= key_code <= 57: 
             sol_index = key_code - 49
             toggle_solenoid(sol_index)
+
 # --- GUI UPDATE LOOP ---
 
 def update_gui():
