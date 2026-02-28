@@ -175,10 +175,10 @@ def toggle_solenoid(solenoid_idx):
         # Map solenoid 0–5 to bits 14–9
         bit_position = 14 - solenoid_idx
 
-        data_store.cmd_solenoid_bits ^= (1 << bit_position)
-
         # Always force MSB validation bit
         data_store.cmd_solenoid_bits |= 0x8000
+        
+        data_store.cmd_solenoid_bits ^= (1 << bit_position)
 
         bits_to_send = data_store.cmd_solenoid_bits
 
