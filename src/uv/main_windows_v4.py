@@ -5,9 +5,19 @@ import dearpygui.dearpygui as dpg
 
 BAUD = 115200
 HISTORY_LENGTH = 150 # Number of ticks to display on the scrolling plots
-ADS_LSB = 0.0001875  # GAIN_TWOTHIRDS
-V_MIN = 0.5
+
 V_MAX = 4.5
+V_MIN = 0.5
+V_DIFF = V_MAX - V_MIN
+HIGH_PRESSURE_MAX = 5000
+LOW_PRESSURE_MAX = 2000
+
+ORIGINAL_ADS_VOLTAGE_RANGE = 4.096
+GAIN = 2/3
+ADS_VOLTAGE_RANGE = ORIGINAL_ADS_VOLTAGE_RANGE / GAIN
+
+ADS_COUNT_RANGE = 2**15 - 1
+ADS_UNIT_VOLTAGE = ADS_VOLTAGE_RANGE / ADS_COUNT_RANGE
 
 # Global configuration set by the setup window
 config = {
@@ -19,7 +29,7 @@ config = {
     "total_sensors": 4,
     "packet_format": "<IIBBH4H",
     "packet_size": 20,
-    "pressure_types": ["high", "low", "low", "low"]
+    "sensor_type": ["high", "low", "low","low"]
 }
 
 class TelemetryData:
@@ -236,33 +246,26 @@ def zero_pressures():
     with data_store.lock:
         for i in range(config["num_p"]):
             if len(data_store.history_y[i]) > 0:
-                psi = convert_pressure(data_store.history_y[i][-1], i)
+                # Convert centiPSI to PSI
+                psi = data_store.history_y[i][-1] / 10.0
                 data_store.pressure_zero_offsets[i] = psi
 
     print("Pressures zeroed.")
 
 def convert_pressure(raw_adc, sensor_index):
 
-    voltage = raw_adc * ADS_LSB
+    voltage = raw_adc * ADS_UNIT_VOLTAGE
 
-    if config["pressure_types"][sensor_index] == "low":
-        PSI_MAX = 2000.0
+    if config["sensor_type"][sensor_index] == "low":
+        psi = (voltage - V_MIN) / V_DIFF * LOW_PRESSURE_MAX
+    elif config["sensor_type"][sensor_index] == "high":
+        psi = (voltage - V_MIN) / V_DIFF * HIGH_PRESSURE_MAX
     else:
-        PSI_MAX = 5000.0
-
-    slope = PSI_MAX / (V_MAX - V_MIN)
-
-    psi = (voltage - V_MIN) * slope
+        return 0
 
     zero = data_store.pressure_zero_offsets.get(sensor_index, 0.0)
 
-    psi = psi - zero
-
-    # ONLY clamp upper bound
-    if psi > PSI_MAX:
-        psi = PSI_MAX
-
-    return psi
+    return psi - zero
 
 # --- GUI UPDATE LOOP ---
 
@@ -307,7 +310,6 @@ def update_gui():
 
                     # Update plot line
                     if cat_prefix == "P":
-                        zero = data_store.pressure_zero_offsets[i]
                         y_plot = [convert_pressure(v, i) for v in y_data]
                     else:
                         y_plot = y_data
@@ -315,7 +317,6 @@ def update_gui():
                     dpg.set_value(f"{cat_prefix}_plot_{i}", [x_data, y_plot])
 
                     if cat_prefix == "P":
-                        zero = data_store.pressure_zero_offsets[i]
                         calibrated_vals = [convert_pressure(v, i) for v in y_data]
                         all_vals.extend(calibrated_vals)
                     else:
