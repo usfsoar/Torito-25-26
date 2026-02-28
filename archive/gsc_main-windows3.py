@@ -125,9 +125,9 @@ def key_press_handler(sender, app_data):
     # Check specifically for Left Shift or Right Shift
     if dpg.is_key_down(dpg.mvKey_LShift) or dpg.is_key_down(dpg.mvKey_RShift):
         # Map keys '1' through '9
-        # ' (key codes 49-57) to solenoid indices 0 through 8
-        if 49 <= key_code <= 57: 
-            sol_index = key_code - 49
+        # ' (key codes 537-545) to solenoid indices 0 through 8
+        if 537 <= key_code <= 545: 
+            sol_index = key_code - 537
             toggle_solenoid(sol_index)
 
 # --- GUI UPDATE LOOP ---

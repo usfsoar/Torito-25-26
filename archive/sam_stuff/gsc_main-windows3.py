@@ -24,8 +24,8 @@ config = {
 
 class TelemetryData:
     def __init__(self):
-        self.solenoid_bits = 0
-        self.cmd_solenoid_bits = 0 # What we want to send
+        self.solenoid_bits = 0x8000
+        self.cmd_solenoid_bits = 0x8000 # What we want to send
         self.history_y = {} # Will be populated dynamically
         self.history_x = {}
         self.current_tick = 0
@@ -131,8 +131,8 @@ def key_press_handler(sender, app_data):
     key_code = app_data
     # Check specifically for Left Shift or Right Shift
     if dpg.is_key_down(dpg.mvKey_LShift) or dpg.is_key_down(dpg.mvKey_RShift):
-        if 49 <= key_code <= 57:
-            sol_index = key_code - 49
+        if 537 <= key_code <= 45:
+            sol_index = key_code - 537
             toggle_solenoid(sol_index)
 
 
