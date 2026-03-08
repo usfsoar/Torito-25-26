@@ -1,0 +1,69 @@
+{
+  "test": {
+    "name": "CF1",
+    "date": "2026-02-28"
+  },
+
+  "packet": {
+    "format": "<IIBBH4H",
+    "size": 22,
+    "fields": [
+      ["timestamp", "I"],
+      ["seq", "I"],
+      ["mask", "B"],
+      ["status", "B"],
+      ["solenoids", "H"]
+    ],
+    "adc_channels": 4
+  },
+
+  "adc": {
+    "voltage_range": 4.096,
+    "gain": 0.6666667,
+    "count_range": 32767
+  },
+
+  "sensors": {
+    "pressure": {
+      "prefix": "P",
+      "channels": [0,1,2,3],
+      "types": ["high","low","low","low"],
+      "units": "psi",
+      "calibration": {
+        "v_min": 0.5,
+        "v_max": 4.5,
+        "high_pressure_max": 5000,
+        "low_pressure_max": 2000
+      }
+    },
+
+    "temperature": {
+      "prefix": "T",
+      "channels": [],
+      "units": "C",
+      "calibration": {
+        "v_offset": 0.5,
+        "v_per_degree": 0.01
+      }
+    }
+  },
+
+  "output": {
+    "csv": "CF.csv",
+    "plot_directory": "plots"
+  },
+
+  "plot": {
+    "pressure": {
+      "title": "Pressure vs Time",
+      "ylabel": "Pressure (psi)"
+    },
+
+    "temperature": {
+      "title": "Temperature vs Time",
+      "ylabel": "Temperature (C)"
+    },
+
+    "time_column": "time"
+  }
+}
