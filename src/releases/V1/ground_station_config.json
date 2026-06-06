@@ -1,0 +1,165 @@
+{
+  "port": "COM3",
+  "pressure_sensors": 4,
+  "temperature_sensors": 0,
+  "load_cells": 0,
+  "valves": 4,
+  "relay_map": {
+    "1": 14,
+    "2": 13,
+    "3": 12,
+    "4": 11,
+    "5": 10,
+    "6": 9,
+    "7": 8,
+    "8": 7,
+    "9": 6
+  },
+  "macros": [
+    {
+      "key": "B",
+      "name": "Example Sequence",
+      "steps": [
+        {
+          "action": "set",
+          "states": {
+            "1": "high",
+            "2": "low",
+            "3": "low",
+            "4": "low"
+          }
+        },
+        {
+          "action": "wait",
+          "seconds": 0.5
+        },
+        {
+          "action": "set",
+          "states": {
+            "1": "low",
+            "2": "high",
+            "3": "low",
+            "4": "low"
+          }
+        },
+        {
+          "action": "wait",
+          "seconds": 0.5
+        },
+        {
+          "action": "set",
+          "states": {
+            "1": "low",
+            "2": "low",
+            "3": "low",
+            "4": "low"
+          }
+        }
+      ]
+    },
+    {
+      "key": "C",
+      "name": "WaterFlow 1",
+      "steps": [
+        {
+          "action": "set",
+          "states": {
+            "1": "high",
+            "2": "low",
+            "3": "low",
+            "4": "low"
+          }
+        },
+        {
+          "action": "wait",
+          "seconds": 5.0
+        },
+        {
+          "action": "set",
+          "states": {
+            "1": "high",
+            "2": "high",
+            "3": "low",
+            "4": "low"
+          }
+        },
+        {
+          "action": "wait",
+          "seconds": 10.0
+        },
+        {
+          "action": "set",
+          "states": {
+            "1": "high",
+            "2": "high",
+            "3": "low",
+            "4": "high"
+          }
+        },
+        {
+          "action": "wait",
+          "seconds": 0.21
+        },
+        {
+          "action": "set",
+          "states": {
+            "1": "high",
+            "2": "high",
+            "3": "high",
+            "4": "high"
+          }
+        }
+      ]
+    }
+  ],
+  "pressure_sensor_configs": [
+    {
+      "name": "P-1",
+      "adc_model": "ADS1115_16BIT",
+      "adc_bits": 16,
+      "adc_max_count": 32767,
+      "adc_full_scale_voltage": 6.144,
+      "voltage_min": 0.5,
+      "voltage_max": 4.5,
+      "pressure_max_psig": 5000.0
+    },
+    {
+      "name": "P-2",
+      "adc_model": "ADS1115_16BIT",
+      "adc_bits": 16,
+      "adc_max_count": 32767,
+      "adc_full_scale_voltage": 6.144,
+      "voltage_min": 0.5,
+      "voltage_max": 4.5,
+      "pressure_max_psig": 5000.0
+    },
+    {
+      "name": "P-3",
+      "adc_model": "ADS1115_16BIT",
+      "adc_bits": 16,
+      "adc_max_count": 32767,
+      "adc_full_scale_voltage": 6.144,
+      "voltage_min": 0.5,
+      "voltage_max": 4.5,
+      "pressure_max_psig": 5000.0
+    },
+    {
+      "name": "P-4",
+      "adc_model": "ADS1115_16BIT",
+      "adc_bits": 16,
+      "adc_max_count": 32767,
+      "adc_full_scale_voltage": 6.144,
+      "voltage_min": 0.5,
+      "voltage_max": 4.5,
+      "pressure_max_psig": 5000.0
+    }
+  ],
+  "packet_config": {
+    "baud": 115200,
+    "sync_hex": "AA55",
+    "endian": "<",
+    "base_format": "IIBBH",
+    "adc_format": "H",
+    "command_template": "0x{bits:04X},2\n"
+  }
+}
