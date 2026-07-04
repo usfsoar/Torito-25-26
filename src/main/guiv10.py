@@ -29,6 +29,7 @@ from typing import Any
 
 import serial
 import serial.tools.list_ports
+import socket
 from PyQt6 import QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
 
@@ -348,6 +349,143 @@ class SerialWorker(QtCore.QThread):
 
         except Exception as exc:
             self.log_message.emit(f"[SERIAL ERROR] {exc}")
+        finally:
+            try:
+                if log_file:
+                    log_file.close()
+            finally:
+                self.connection_changed.emit(False)
+
+
+
+class EthernetWorker(QtCore.QThread):
+    packet_received = QtCore.pyqtSignal(object)
+    log_message = QtCore.pyqtSignal(str)
+    connection_changed = QtCore.pyqtSignal(bool)
+
+    def __init__(self, config: AppConfig):
+        super().__init__()
+        self.config = config
+        self.command_queue: queue.Queue[int] = queue.Queue()
+        self._running = threading.Event()
+        self._running.set()
+        self._socket: socket.socket | None = None
+
+    def queue_command(self, cmd_bits: int) -> None:
+        self.command_queue.put(cmd_bits & 0xFFFF)
+
+    def clear_command_queue(self) -> None:
+        while not self.command_queue.empty():
+            try:
+                self.command_queue.get_nowait()
+            except queue.Empty:
+                break
+
+    def stop(self) -> None:
+        self._running.clear()
+        try:
+            # TODO** Stop socket if needed
+            pass
+        except Exception:
+            pass
+
+    def run(self) -> None:
+        log_file = None
+        try:
+            # self._ser = serial.Serial(self.config.port, self.config.baud, timeout=0)
+            self._socket = socket.socket() # TODO** Fill init this right
+            # TODO** Try to connect to socket
+            # Possibly might need two sockets for both send and recieve
+            self.connection_changed.emit(True)
+            self.log_message.emit(f"[ETHERNET] Connected to {self.config.port}") # TODO** Change this value
+            self.log_message.emit(f"[ETHERNET] Expecting {self.config.packet_size} payload bytes") # TODO** Change this value
+
+            log_file = open(f"telemetry_{int(time.time())}.csv", "w", newline="")
+            writer = csv.writer(log_file)
+            headers = ["timestamp", "seq", "solenoids"]
+            headers += [f"P_{i}" for i in range(self.config.num_p)] # Number of pressure sensors
+            headers += [f"T_{i}" for i in range(self.config.num_t)] # Number temperature sensors
+            headers += [f"LC_{i}" for i in range(self.config.num_lc)] # Number of load cells
+            writer.writerow(headers)
+
+            buffer = bytearray()
+            start_time = time.time()
+            sync_bytes = self.config.sync_bytes
+            sync_len = len(sync_bytes)
+            total_packet_size = sync_len + self.config.packet_size
+
+            while self._running.is_set():
+                while not self.command_queue.empty():
+                    cmd_bits = self.command_queue.get_nowait()
+                    try:
+                        message = self.config.command_template.format(bits=cmd_bits)
+                    except Exception:
+                        message = f"0x{cmd_bits:04X},2\n"
+
+                    # Find :repeat on end to see if reporting lock???
+                    # TODO** Figure out what this even is and what we should do for it
+
+                    # Find comma
+                    comma_index = message.find(",")
+
+                    # remove 0:comma_index
+                    board_message = message[comma_index + 1:]
+
+                    # Write over tcp to teensy
+                    # TODO** May need to connect to the port differently
+                    self._socket.sendall(board_message)
+
+                    self.log_message.emit(f"[GUI] Sent: {message.strip()}")
+
+
+                # TODO** What does this do??
+                incoming = self._ser.read(self._ser.in_waiting or 1)
+                if incoming:
+                    buffer.extend(incoming)
+
+
+                while True:
+                    if len(buffer) < sync_len:
+                        break
+
+                    sync_index = buffer.find(sync_bytes)
+                    if sync_index == -1:
+                        buffer.clear()
+                        break
+
+                    if sync_index > 0:
+                        del buffer[:sync_index]
+
+                    if len(buffer) < total_packet_size:
+                        break
+
+                    # TODO** 
+                    raw = buffer[sync_len:total_packet_size]
+                    del buffer[:total_packet_size]
+
+
+                    # TODO** Replace with socket message
+                    try:
+                        unpacked = struct.unpack(self.config.packet_format, raw)
+                    except Exception as exc:
+                        self.log_message.emit(f"[ETHERNET] Unpack failed: {exc}")
+                        continue
+
+                    ts, seq, mask, status, solenoids = unpacked[:5] # TODO** replace with message from ethernet
+                    adc_values = tuple(int(v) for v in unpacked[5:]) # TODO** replace with message from ethernet
+
+
+                    elapsed = time.time() - start_time
+
+                    packet = Packet(ts, seq, mask, status, solenoids, adc_values, elapsed)
+                    self.packet_received.emit(packet)
+                    writer.writerow([ts, seq, f"{solenoids:016b}"] + list(adc_values)) # TODO** Need to update with new sensor values
+                    log_file.flush()
+
+                self.msleep(1)
+
+        except Exception as exc:
+            self.log_message.emit(f"[ETHERNET ERROR] {exc}")
         finally:
             try:
                 if log_file:
