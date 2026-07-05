@@ -1,0 +1,40 @@
+from labjack import ljm
+
+LABJACK_IP = "ANY"
+
+class lj_interface():
+    def __init__(self) -> None:
+        self.device_Name = "T7"
+        self.connection_type = "ETHERNET"
+
+        self.handle: int | None = None
+
+        self.scan_names = ["AIN0", "AIN1", "AIN2", "AIN3", "AIN4", "AIN5", "AIN6", 
+                           "AIN7", "AIN8", "AIN9", "AIN10", "AIN11", "AIN12", "AIN13"]
+        self.scan_rate = 100.0
+        self.scans_per_read = 5
+        self.scanStarted = False
+
+    def startStreamLJ(self) -> None:
+        if self.handle is None:
+            raise RuntimeError("LabJack handle not available")
+        
+        if self.stream_started:
+            return print("Stream already started. Cannot start more than once.")
+
+        scan_list, _ = ljm.namesToAddresses(len(self.scan_names),self.scan_names)
+
+        try:
+            self.scan_rate = ljm.eStreamStart(self.handle, self.scans_per_read, len(scan_list),scan_list,self.scan_rate)
+            self.stream_started = True
+        except Exception as e:
+            print(f"An error occured while starting the stream: {e}")
+
+    def readStreamLJ(self):
+        pass
+
+    def stopStreamLJ(self):
+        pass
+
+    def closeLJ(self):
+        pass
